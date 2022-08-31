@@ -10,11 +10,11 @@ import com.example.myapplication.databinding.MessageItemBinding
 import com.example.myapplication.network.bean.MessageBean
 import com.example.myapplication.room.Message
 import java.time.format.DateTimeFormatter
+@RequiresApi(Build.VERSION_CODES.O)
 
 class MessageAdapter(private val list:List<Message>):RecyclerView.Adapter<MessageAdapter.ItemViewHolder>() {
 
     class ItemViewHolder(private val mBinding: MessageItemBinding):RecyclerView.ViewHolder(mBinding.root){
-            @RequiresApi(Build.VERSION_CODES.O)
             fun bind(itemBean:Message){
                 mBinding.message.text = itemBean.message
                 mBinding.email.text = itemBean.from

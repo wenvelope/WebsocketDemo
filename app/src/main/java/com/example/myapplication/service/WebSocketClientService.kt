@@ -6,8 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.*
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
+import androidx.core.content.ContextCompat.getSystemService
 import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.network.MyWebSocketClient
@@ -35,13 +37,13 @@ class WebSocketClientService : Service() {
             return this@WebSocketClientService
         }
     }
-
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
         sp = getSharedPreferences("TOKEN",Context.MODE_PRIVATE)
         token = sp.getString("TOKEN","SB")!!
 
-        GlobalScope.launch (Dispatchers.IO){
+
             webSocketClient = object : MyWebSocketClient(webSocketUrl) {
                 override fun onMessage(p0: String?) {
                     super.onMessage(p0)
@@ -78,7 +80,7 @@ class WebSocketClientService : Service() {
             }
            webSocketClient.addHeader("TOKEN",token)
            webSocketClient.connectBlocking()
-        }
+
 
 
         val handler = Handler(mainLooper)
@@ -102,6 +104,7 @@ class WebSocketClientService : Service() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun sendNotification(from:String , message:String){
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

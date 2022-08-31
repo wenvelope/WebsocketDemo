@@ -5,14 +5,22 @@ import android.app.AlertDialog
 import android.content.*
 import android.net.Uri
 import android.os.*
-import android.view.inputmethod.InputMethodManager
+import android.view.View
 import android.widget.LinearLayout.VERTICAL
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.adapter.MessageAdapter
@@ -22,7 +30,6 @@ import com.example.myapplication.network.bean.MessageBean
 import com.example.myapplication.room.Message
 import com.example.myapplication.room.MessageRepository
 import com.example.myapplication.room.UserDatabase
-import com.example.myapplication.room.UserRepository
 import com.example.myapplication.service.WebSocketClientService
 import com.example.myapplication.spread.KeyboardChangeListener
 import com.example.myapplication.spread.addLog
@@ -30,22 +37,20 @@ import com.example.myapplication.spread.showToast
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 class MainActivity : AppCompatActivity() {
     private lateinit var mBinding:ActivityMainBinding
-    private lateinit var mModel:MyViewModel
+    private val mModel:MyViewModel by viewModels()
     private val database by lazy { UserDatabase.getDataBase(this) }
     private val messageRepository by lazy { MessageRepository(database.MessageDao()) }
     private lateinit var sp:SharedPreferences
-    private lateinit var token:String
+    lateinit var token:String
     private lateinit var mSocketClient: MyWebSocketClient
     private lateinit var mBinder:WebSocketClientService.WebSocketClientBinder
     private lateinit var mService:WebSocketClientService
-
     private val serviceConnection = object :ServiceConnection{
         override fun onServiceConnected(name: ComponentName , service: IBinder) {
             mBinder = service  as WebSocketClientService.WebSocketClientBinder
@@ -60,6 +65,8 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
+
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,11 +75,15 @@ class MainActivity : AppCompatActivity() {
         //绑定websocket服务
         val bindIntent = Intent(this,WebSocketClientService::class.java)
         bindService(bindIntent,serviceConnection, BIND_AUTO_CREATE)
-
-        mModel = ViewModelProvider(this)[MyViewModel::class.java]
         sp = getSharedPreferences("TOKEN",Context.MODE_PRIVATE)
         token = sp.getString("TOKEN","SB")!!
+//
+        val naviHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as  NavHostFragment
+        val naviController = naviHostFragment.findNavController()
+//        NavigationUI.setupWithNavController(mBinding.naviMain,naviController)
 
+//        val naviController = findNavController(R.id.fragmentContainerView)
+        mBinding.naviMain.setupWithNavController(naviController)
 
         //注册广播接收
         val receiver = ChatMessageReceiver()
@@ -83,9 +94,9 @@ class MainActivity : AppCompatActivity() {
         //软键盘弹起监听
         val keyboardHelper = KeyboardChangeListener(this).apply {
             setKeyBoardListener { _ , _ ->
-                mBinding.chatView.smoothScrollToPosition(
-                    mModel.messageList.size
-                )
+//                mBinding.chatView.smoothScrollToPosition(
+//                    mModel.messageList.size
+//                )
             }
         }
 
@@ -105,10 +116,10 @@ class MainActivity : AppCompatActivity() {
         mModel.messageInfo.observe(this){
             mModel.messageList.clear()
             mModel.messageList.addAll(it)
-            mBinding.chatView.apply {
-                adapter?.notifyDataSetChanged()
-                smoothScrollToPosition(mModel.messageList.size)
-            }
+//            mBinding.chatView.apply {
+//                adapter?.notifyDataSetChanged()
+//                smoothScrollToPosition(mModel.messageList.size)
+//            }
 
         }
         //网络状态监听
@@ -126,36 +137,32 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        //页面初始化
-        mBinding.apply {
-            switchEmail.setOnClickListener {
-                val email =toEmail.text.toString()
-                sp.edit().apply{
-                    putString("sendEmail",email)
-                    apply()
-                    "设置成功".showToast()
-                }
-            }
-            sendButton.setOnClickListener {
-                val message = sendMessage.text.toString()
-                val sendEmail = sp.getString("sendEmail",token)!!
-                sendMessage(message,sendEmail)
-                sendMessage.setText("")
-            }
 
-            chatView.layoutManager = LinearLayoutManager(this@MainActivity)
-            chatView.addItemDecoration(DividerItemDecoration(this@MainActivity,VERTICAL))
-            chatView.adapter = MessageAdapter(mModel.messageList)
-        }
+//        //页面初始化
+//        mBinding.apply {
+//            switchEmail.setOnClickListener {
+//                val email =toEmail.text.toString()
+//                sp.edit().apply{
+//                    putString("sendEmail",email)
+//                    apply()
+//                    "设置成功".showToast()
+//                }
+//            }
+//            sendButton.setOnClickListener {
+//                val message = sendMessage.text.toString()
+//                val sendEmail = sp.getString("sendEmail",token)!!
+//                sendMessage(message,sendEmail)
+//                sendMessage.setText("")
+//            }
+//
+//            chatView.layoutManager = LinearLayoutManager(this@MainActivity)
+//            chatView.addItemDecoration(DividerItemDecoration(this@MainActivity,VERTICAL))
+//            chatView.adapter = MessageAdapter(mModel.messageList)
+//        }
         //通知权限
         checkNotification(this)
-        //获取聊天记录
-        mModel.getMessage()
-
-
     }
-
-    private fun sendMessage(message:String,sendEmail:String){
+    fun sendMessage(message:String,sendEmail:String){
         if(message.isNotEmpty()){
             val str = with(Gson()){
                 this.toJson(MessageBean(token,sendEmail,message))
@@ -170,6 +177,11 @@ class MainActivity : AppCompatActivity() {
             "发送消息为空".showToast()
         }
 
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        mBinding.naviMain.visibility = View.VISIBLE
     }
 
 

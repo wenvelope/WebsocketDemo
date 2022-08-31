@@ -43,15 +43,18 @@ class MyViewModel: ViewModel() {
 
     val netState = MutableLiveData<Int>()
 
-    private val _messageInfo = MutableLiveData<Any?>()
+    private val _messageInfo = MutableLiveData<String>()
 
-    fun getMessage(){
-        _messageInfo.value = _messageInfo.value
+    fun getMessage(sendEmail:String){
+        _messageInfo.value = sendEmail
     }
 
     val messageInfo = Transformations.switchMap(_messageInfo){
-        messageRepository.getMessages()
+        messageRepository.getMessage(it)
     }
+
+
+    val chatList = ArrayList<String>()
 
 
 

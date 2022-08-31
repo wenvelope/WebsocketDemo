@@ -12,4 +12,6 @@ interface MessageDao {
 
     @Query("select * from messages order by dateTime(dateTime)")
     fun selectAllMessages():Flow<List<Message>>
+    @Query("select * from messages where `from` = (:sendEmail) or `to` =(:sendEmail)  order by dateTime(dateTime)")
+    fun selectMessages(sendEmail:String):Flow<List<Message>>
 }

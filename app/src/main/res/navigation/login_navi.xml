@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/login_navi">
+    android:id="@+id/login_navi"
+    app:startDestination="@id/chatListFragment">
+
+    <fragment
+        android:id="@+id/contactFragment"
+        android:name="com.example.myapplication.ui.ContactFragment"
+        android:label="ContactFragment" >
+        <action
+            android:id="@+id/action_contactFragment_to_chatListFragment"
+            app:destination="@id/chatListFragment"
+            app:popUpTo="@id/contactFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatListFragment"
+        android:name="com.example.myapplication.ui.ChatListFragment"
+        android:label="ChatListFragment" >
+        <action
+            android:id="@+id/action_chatListFragment_to_chatFragment"
+            app:destination="@id/chatFragment"
+            app:launchSingleTop="false"
+            app:popUpTo="@id/chatListFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.myapplication.ui.ChatFragment"
+        android:label="ChatFragment" >
+    </fragment>
 
 </navigation>

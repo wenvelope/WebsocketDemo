@@ -12,58 +12,33 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-        <EditText
-            android:id="@+id/toEmail"
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/navi_main"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:background="@color/white"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/switch_Email"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/chatView"
-            />
-        <Button
-            android:id="@+id/switch_Email"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:padding="3dp"
-            android:text="confirm"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/toEmail"
-            app:layout_constraintBottom_toTopOf="@+id/chatView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="60dp"
+            app:menu="@menu/main_bottom_navi"
             />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/chatView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@+id/toEmail"
-            app:layout_constraintBottom_toTopOf="@+id/send_Message"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            />
-        <EditText
-            android:id="@+id/send_Message"
+
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentContainerView"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:maxLines="3"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/navi_main"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/send_Button"
-            app:layout_constraintTop_toBottomOf="@+id/chatView"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
-        <Button
-            android:id="@+id/send_Button"
-            android:layout_width="60dp"
-            android:layout_height="40dp"
-            android:padding="3dp"
-            android:text="send"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/chatView"
-            app:layout_constraintStart_toEndOf="@+id/send_Message"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
-        
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/login_navi" />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

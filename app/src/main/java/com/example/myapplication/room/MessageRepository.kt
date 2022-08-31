@@ -6,10 +6,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 
 class MessageRepository(private val messageDao: MessageDao) {
-    fun getMessages() = liveData(Dispatchers.IO){
+    fun getAllMessages() = liveData(Dispatchers.IO){
         messageDao.selectAllMessages().collect{
                 "数据更新了".addLog()
                 emit(it)
+        }
+    }
+    fun getMessage(sendEmail:String)= liveData(Dispatchers.IO){
+        messageDao.selectMessages(sendEmail).collect{
+            emit(it)
         }
     }
 
